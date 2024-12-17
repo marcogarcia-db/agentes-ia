@@ -3,24 +3,24 @@
 -- MAGIC
 -- MAGIC # Usando Agentes de IA
 -- MAGIC
--- MAGIC Capacitación práctica en la plataforma Databricks con enfoque en funcionalidades de IA generativa.
+-- MAGIC Treinamento pratico na plataforma Databricks com foco em funcionalidades de IA generativa.
 
 -- COMMAND ----------
 
 -- MAGIC %md
--- MAGIC ## Objetivo del ejercicio
+-- MAGIC ## Objetivo do exercicio
 -- MAGIC
--- MAGIC El objetivo de este laboratorio es implementar el siguiente caso de uso:
+-- MAGIC O objetivo deste laboratorio e implementar o seguinte caso de uso:
 -- MAGIC
--- MAGIC ### Personalización del servicio con Agentes
+-- MAGIC ### Personalizacao do servico com Agentes
 -- MAGIC
--- MAGIC Los LLM son excelentes para responder preguntas. Sin embargo, esto por sí solo no es suficiente para ofrecer valor a sus clientes.
+-- MAGIC Os LLMs sao excelentes para responder perguntas. No entanto, isso por si so nao e suficiente para oferecer valor aos seus clientes.
 -- MAGIC
--- MAGIC Para poder proporcionar respuestas más complejas, se requiere información adicional específica del usuario, como su ID de contrato, el último correo electrónico que envió a su soporte o su informe de compra más reciente.
+-- MAGIC Para poder fornecer respostas mais complexas, e necessaria informacao adicional especifica do usuario, como seu ID de contrato, o ultimo e-mail que enviou ao suporte ou seu relatorio de compra mais recente.
 -- MAGIC
--- MAGIC Los agentes están diseñados para superar este desafío. Son despliegues de IA más avanzados, compuestos por múltiples entidades (herramientas) especializadas en diferentes acciones (recuperar información o interactuar con sistemas externos).
+-- MAGIC Os agentes sao projetados para superar esse desafio. Sao implantacoes de IA mais avancadas, compostas por multiplas entidades (ferramentas) especializadas em diferentes acoes (recuperar informacoes ou interagir com sistemas externos).
 -- MAGIC
--- MAGIC En términos generales, usted crea y presenta un conjunto de funciones personalizadas a la IA. Luego, el LLM puede razonar sobre qué información debe recopilarse y qué herramientas utilizar para responder a las instrucciones que recibe.
+-- MAGIC Em termos gerais, voce cria e apresenta um conjunto de funcoes personalizadas a IA. Em seguida, o LLM pode raciocinar sobre quais informacoes devem ser coletadas e quais ferramentas utilizar para responder as instrucoes que recebe.
 -- MAGIC <br><br>
 -- MAGIC
 -- MAGIC <img src="https://github.com/mousastech/agentes_ia/blob/e4602f57c4a83b171c7c541e11244136cdd80816/img/llm-call.png?raw=true" width="100%">
@@ -28,104 +28,104 @@
 -- COMMAND ----------
 
 -- MAGIC %md
--- MAGIC ## Preparación
+-- MAGIC ## Preparacao
 -- MAGIC
--- MAGIC Para realizar los ejercicios, necesitamos prender a un Clúster.
+-- MAGIC Para realizar os exercicios, precisamos conectar a um Cluster.
 -- MAGIC
--- MAGIC Simplemente siga los pasos a continuación:
--- MAGIC 1. En la esquina superior derecha, haga clic en **Conectar**
--- MAGIC 2. Seleccione el tipo de Clúster **SQL Serverless Warehouse** o **Serverless**.
+-- MAGIC Simplesmente siga os passos abaixo:
+-- MAGIC 1. No canto superior direito, clique em **Conectar**
+-- MAGIC 2. Selecione o tipo de Cluster **SQL Serverless Warehouse** ou **Serverless**.
 
 -- COMMAND ----------
 
 -- MAGIC %md 
 -- MAGIC
--- MAGIC ## Conjunto de datos de ejemplo
+-- MAGIC ## Conjunto de dados de exemplo
 -- MAGIC
--- MAGIC Ahora, accedamos a las reseñas de productos que subimos en la práctica de laboratorio anterior.
+-- MAGIC Agora, vamos acessar as avaliacoes de produtos que carregamos na pratica de laboratorio anterior.
 -- MAGIC
--- MAGIC En esta práctica de laboratorio usaremos dos tablas:
--- MAGIC - **Evaluaciones**: datos no estructurados con el contenido de las evaluaciones
--- MAGIC - **Clientes**: datos estructurados como registro de clientes y consumo.
+-- MAGIC Nesta pratica de laboratorio usaremos duas tabelas:
+-- MAGIC - **Avaliacoes**: dados nao estruturados com o conteudo das avaliacoes
+-- MAGIC - **Clientes**: dados estruturados como registro de clientes e consumo.
 -- MAGIC
--- MAGIC ¡Ahora visualicemos estos datos!
+-- MAGIC Vamos visualizar esses dados!
 
 -- COMMAND ----------
 
--- MAGIC %md ### A. Preparación de datos
+-- MAGIC %md ### A. Preparacao de dados
 -- MAGIC
--- MAGIC 1. Crear o utilizar el catalogo `funcionesai`
--- MAGIC 2. Crear o utilizar el schema `carga`
--- MAGIC 3. Crear el volumen `archivos`
--- MAGIC 4. Importar los archivos de la carpeta `data` para el Volumen creado
+-- MAGIC 1. Criar ou utilizar o catalogo `funcoesai`
+-- MAGIC 2. Criar ou utilizar o schema `carga`
+-- MAGIC 3. Criar o volume `arquivos`
+-- MAGIC 4. Importar os arquivos da pasta `data` para o Volume criado
 -- MAGIC
--- MAGIC Código disponible en el notebook `⚙️ ./Setup`
+-- MAGIC Codigo disponivel no notebook `⚙️ ./Setup`
 
 -- COMMAND ----------
 
--- MAGIC %md ## Usando el Unity Catalog Tools
+-- MAGIC %md ## Usando o Unity Catalog Tools
 -- MAGIC
--- MAGIC El primer paso en la construcción de nuestro agente será entender cómo utilizar **Unity Catalog Tools**.
+-- MAGIC O primeiro passo na construcao do nosso agente sera entender como utilizar o **Unity Catalog Tools**.
 -- MAGIC
--- MAGIC En la práctica de laboratorio anterior, creamos algunas funciones, como `revisar_evaluacion`, que nos permitió facilitar la invocación de nuestros modelos de IA generativa desde SQL. Sin embargo, nuestros LLM también pueden utilizar estas mismas funciones como herramientas. ¡Simplemente indique qué funciones puede utilizar el modelo!
+-- MAGIC Na pratica de laboratorio anterior, criamos algumas funcoes, como `revisar_avaliacao`, que nos permitiu facilitar a invocacao dos nossos modelos de IA generativa a partir do SQL. No entanto, nossos LLMs tambem podem utilizar essas mesmas funcoes como ferramentas. Basta indicar quais funcoes o modelo pode utilizar!
 -- MAGIC
--- MAGIC Poder utilizar el mismo catálogo de herramientas en toda la plataforma nos simplifica enormemente la vida al promover la reutilización de estos activos. Esto puede ahorrar horas de remodelación y estandarizar estos conceptos.
+-- MAGIC Poder utilizar o mesmo catalogo de ferramentas em toda a plataforma simplifica enormemente nossa vida ao promover a reutilizacao desses ativos. Isso pode economizar horas de remodelagem e padronizar esses conceitos.
 -- MAGIC
--- MAGIC ¡Veamos cómo utilizar las herramientas en la práctica!
+-- MAGIC Vamos ver como utilizar as ferramentas na pratica!
 -- MAGIC
--- MAGIC 1. En el **menú principal** de la izquierda, haz clic en **`Playground`**
--- MAGIC 2. Haz clic en el **selector de modelo** y selecciona el modelo **`Meta Llama 3.1 70B Instruct`** (si aún no está seleccionado)
--- MAGIC 3. Hacer clic **Tools** y luego en **Add Tool** 
--- MAGIC 4. En **Hosted Function**, tipear `funcionesai.carga.revisar_avaliacao`
--- MAGIC 5. Agregue instrucciones a continuación:
+-- MAGIC 1. No **menu principal** a esquerda, clique em **`Playground`**
+-- MAGIC 2. Clique no **seletor de modelo** e selecione o modelo **`Meta Llama 3.1 70B Instruct`** (se ainda nao estiver selecionado)
+-- MAGIC 3. Clique em **Tools** e depois em **Add Tool** 
+-- MAGIC 4. Em **Hosted Function**, digite `funcoesai.carga.revisar_avaliacao`
+-- MAGIC 5. Adicione as instrucoes abaixo:
 -- MAGIC     ```
--- MAGIC     Revise la reseña a continuación:
--- MAGIC  Compré una tableta y estoy muy descontento con la calidad de la batería. Dura muy poco y tarda mucho en cargarse.
+-- MAGIC     Revise a avaliacao abaixo:
+-- MAGIC  Comprei um tablet e estou muito insatisfeito com a qualidade da bateria. Dura muito pouco e demora muito para carregar.
 -- MAGIC     ```
--- MAGIC 6. Haga clic en el ícono **enviar**
+-- MAGIC 6. Clique no icone **enviar**
 
 -- COMMAND ----------
 
 -- MAGIC %md ## Consultando dados do cliente
 -- MAGIC
--- MAGIC Ferramentas podem ser utilizadas em diversos cenários, como por exemplo:
+-- MAGIC Ferramentas podem ser utilizadas em diversos cenarios, como por exemplo:
 -- MAGIC
--- MAGIC - Consultar informações em bancos de dados
+-- MAGIC - Consultar informacoes em bancos de dados
 -- MAGIC - Calcular indicadores complexos
--- MAGIC - Gerar um texto baseado nas informações disponíveis
+-- MAGIC - Gerar um texto baseado nas informacoes disponiveis
 -- MAGIC - Interagir com APIs e sistemas externos
 -- MAGIC
--- MAGIC Como já discutimos, isso vai ser muito importante para conseguirmos produzir respostas mais personalizadas e precisas no nosso agente. 
+-- MAGIC Como ja discutimos, isso vai ser muito importante para conseguirmos produzir respostas mais personalizadas e precisas no nosso agente. 
 -- MAGIC
--- MAGIC No nosso caso, gostaríamos de:
+-- MAGIC No nosso caso, gostariamos de:
 -- MAGIC - Consultar os dados do cliente
 -- MAGIC - Pesquisar perguntas e respostas em uma base de conhecimento
--- MAGIC - Fornecer recomendações personalizadas de produtos com base em suas descrições
+-- MAGIC - Fornecer recomendacoes personalizadas de produtos com base em suas descricoes
 -- MAGIC
--- MAGIC Vamos começar pela consulta dos dados do cliente!
+-- MAGIC Vamos comecar pela consulta dos dados do cliente!
 
 -- COMMAND ----------
 
--- MAGIC %md ### A. Seleccione la base de datos creada previamente
+-- MAGIC %md ### A. Selecione o banco de dados criado anteriormente
 
 -- COMMAND ----------
 
-USE funcionesai.carga
+USE funcoesai.carga
 
 -- COMMAND ----------
 
--- MAGIC %md ### B. Crear la función
+-- MAGIC %md ### B. Criar a funcao
 
 -- COMMAND ----------
 
 CREATE OR REPLACE FUNCTION CONSULTAR_CLIENTE(id_cliente BIGINT)
 RETURNS TABLE (nome STRING, sobrenome STRING, num_pedidos INT)
-COMMENT 'Utilice esta función para consultar los datos de un cliente'
+COMMENT 'Utilize esta funcao para consultar os dados de um cliente'
 RETURN SELECT nome, sobrenome, num_pedidos FROM clientes c WHERE c.id_cliente = consultar_cliente.id_cliente
 
 -- COMMAND ----------
 
--- MAGIC %md ### C. Probar la función
+-- MAGIC %md ### C. Testar a funcao
 
 -- COMMAND ----------
 
@@ -133,42 +133,42 @@ SELECT * FROM consultar_cliente(1)
 
 -- COMMAND ----------
 
--- MAGIC %md ### D. Probar la función como herramienta.
+-- MAGIC %md ### D. Testar a funcao como ferramenta.
 -- MAGIC
--- MAGIC 1. En el **menú principal** de la izquierda, haz clic en **`Playground`**
--- MAGIC 2. Haga clic en el **selector de modelo** y seleccione el modelo **`Meta Llama 3.1 70B Instruct`** (si aún no está seleccionado)
--- MAGIC 3. Haga clic en **Tools** y luego en **Add Tools**
--- MAGIC 4. En **Hosted function**, escriba `funcionesai.carga.consultar_cliente` y `funcionesai.carga.revisar_avaliacao`
--- MAGIC 5. Agregue las instrucciones a continuación:<br>
--- MAGIC  `Generar una respuesta al cliente 1 que no está satisfecho con la calidad de la pantalla de su tablet. No olvides personalizar el mensaje con el nombre del cliente.
--- MAGIC 6. Haga clic en el ícono **enviar**
+-- MAGIC 1. No **menu principal** a esquerda, clique em **`Playground`**
+-- MAGIC 2. Clique no **seletor de modelo** e selecione o modelo **`Meta Llama 3.1 70B Instruct`** (se ainda nao estiver selecionado)
+-- MAGIC 3. Clique em **Tools** e depois em **Add Tools**
+-- MAGIC 4. Em **Hosted function**, digite `funcoesai.carga.consultar_cliente` e `funcoesai.carga.revisar_avaliacao`
+-- MAGIC 5. Adicione as instrucoes abaixo:<br>
+-- MAGIC  `Gerar uma resposta ao cliente 1 que nao esta satisfeito com a qualidade da tela do seu tablet. Nao esqueca de personalizar a mensagem com o nome do cliente.
+-- MAGIC 6. Clique no icone **enviar**
 
 -- COMMAND ----------
 
 -- MAGIC %md ### E. Analisando os resultados
 -- MAGIC
--- MAGIC Com o resultado do exercício anterior, siga os passos abaixo:
+-- MAGIC Com o resultado do exercicio anterior, siga os passos abaixo:
 -- MAGIC
 -- MAGIC 1. Na parte inferior da resposta, clique em **`View Trace`** 
--- MAGIC 2. Neste painel, navegue entre as diferentes ações executadas à esquerda
+-- MAGIC 2. Neste painel, navegue entre as diferentes acoes executadas a esquerda
 -- MAGIC
--- MAGIC Dessa forma, você poderá entender a linha de raciocínio do agente, ou seja, quais ações foram executas, com quais parâmetros e em que ordem. Além disso, quando houver algum erro de execução, também servirá de insumo para entendermos e corrigirmos eventuais problemas.
+-- MAGIC Dessa forma, voce podera entender a linha de raciocinio do agente, ou seja, quais acoes foram executadas, com quais parametros e em que ordem. Alem disso, quando houver algum erro de execucao, tambem servira de insumo para entendermos e corrigirmos eventuais problemas.
 
 -- COMMAND ----------
 
--- MAGIC %md ## Búsqueda de preguntas y respuestas en una base de conocimientos
+-- MAGIC %md ## Busca de perguntas e respostas em uma base de conhecimento
 -- MAGIC
--- MAGIC Ahora, necesitamos preparar una función que nos permita aprovechar una base de conocimientos para guiar las respuestas de nuestro agente.
+-- MAGIC Agora, precisamos preparar uma funcao que nos permita aproveitar uma base de conhecimento para orientar as respostas do nosso agente.
 -- MAGIC
--- MAGIC Para hacer esto, usaremos **Vector Search**. Este componente nos permite comparar las preguntas formuladas por nuestro cliente con las de la base de conocimiento y luego recuperar la respuesta correspondiente a la pregunta con mayor similitud. ¡Lo único que debemos hacer es indexar las preguntas frecuentes, que subimos anteriormente, en Vector Search!
+-- MAGIC Para fazer isso, usaremos o **Vector Search**. Este componente nos permite comparar as perguntas formuladas pelo nosso cliente com as da base de conhecimento e depois recuperar a resposta correspondente a pergunta com maior similaridade. A unica coisa que precisamos fazer e indexar as perguntas frequentes, que carregamos anteriormente, no Vector Search!
 -- MAGIC
--- MAGIC ¡Vamos!
+-- MAGIC Vamos la!
 
 -- COMMAND ----------
 
 -- MAGIC %md ### A. Habilitar o Change Data Feed na tabela `FAQ`
 -- MAGIC
--- MAGIC Esta configuración permite a Vector Search leer los datos ingresados, eliminados o modificados en las preguntas frecuentes de forma incremental.
+-- MAGIC Esta configuracao permite ao Vector Search ler os dados inseridos, excluidos ou modificados nas perguntas frequentes de forma incremental.
 
 -- COMMAND ----------
 
@@ -176,49 +176,49 @@ ALTER TABLE faq SET TBLPROPERTIES (delta.enableChangeDataFeed = true)
 
 -- COMMAND ----------
 
--- MAGIC %md ### B. Crear un índice en Búsqueda de vectores (Vector Search)
+-- MAGIC %md ### B. Criar um indice no Vector Search
 -- MAGIC
--- MAGIC 1. No **menu principal** à esquerda, clique em **`Catalog`**
--- MAGIC 2. Busque a sua **tabela** `funcionesai.carga.faq`
+-- MAGIC 1. No **menu principal** a esquerda, clique em **`Catalog`**
+-- MAGIC 2. Busque a sua **tabela** `funcoesai.carga.faq`
 -- MAGIC 3. Clique em `Create` e depois em `Vector search index`
--- MAGIC 4. Preencha o formulário:
+-- MAGIC 4. Preencha o formulario:
 -- MAGIC     - **Nome:** faq_index
 -- MAGIC     - **Primary key:** id
 -- MAGIC     - **Endpoint**: selecione o endpoint desejado
 -- MAGIC     - **Columns to sync:** deixar em branco (sincroniza todas as colunas)
--- MAGIC     - **Embedding source:** Compute embeddings (Vector Search gestiona la indexación/creación de embeddings)
--- MAGIC     - **Embedding source column:** pregunta
+-- MAGIC     - **Embedding source:** Compute embeddings (Vector Search gerencia a indexacao/criacao de embeddings)
+-- MAGIC     - **Embedding source column:** pergunta
 -- MAGIC     - **Embedding model:** databricks-gte-large-en
 -- MAGIC     - **Sync computed embeddings:** desabilitado
 -- MAGIC     - **Sync mode:** Triggered
 -- MAGIC 5. Clique em `Create`
--- MAGIC 6. Aguarde a criação do índice finalizar
+-- MAGIC 6. Aguarde a criacao do indice finalizar
 
 -- COMMAND ----------
 
--- MAGIC %md ### C. Crear la función
+-- MAGIC %md ### C. Criar a funcao
 
 -- COMMAND ----------
 
-CREATE OR REPLACE FUNCTION consultar_faq(pregunta STRING)
-RETURNS TABLE(id LONG, pregunta STRING, respuesta STRING, search_score DOUBLE)
-COMMENT 'Utilice esta función para consultar la base de conocimientos sobre tiempos de entrega, solicitudes de cambio o devolución, entre otras preguntas frecuentes sobre nuestro mercado.'
+CREATE OR REPLACE FUNCTION consultar_faq(pergunta STRING)
+RETURNS TABLE(id LONG, pergunta STRING, resposta STRING, search_score DOUBLE)
+COMMENT 'Utilize esta funcao para consultar a base de conhecimento sobre prazos de entrega, solicitacoes de troca ou devolucao, entre outras perguntas frequentes sobre nosso mercado.'
 RETURN select * from vector_search(
-  index => 'funcionesai.carga.faq_index', 
-  query => consultar_faq.pregunta,
+  index => 'funcoesai.carga.faq_index', 
+  query => consultar_faq.pergunta,
   num_results => 1
 )
 
 -- COMMAND ----------
 
-CREATE OR REPLACE FUNCTION funcionesai.carga.consultar_faq(pregunta STRING)
+CREATE OR REPLACE FUNCTION funcoesai.carga.consultar_faq(pergunta STRING)
 RETURNS STRING
-COMMENT 'Utilice esta función para consultar la base de conocimientos sobre tiempos de entrega, solicitudes de cambio o devolución, entre otras preguntas frecuentes sobre nuestro mercado.'
+COMMENT 'Utilize esta funcao para consultar a base de conhecimento sobre prazos de entrega, solicitacoes de troca ou devolucao, entre outras perguntas frequentes sobre nosso mercado.'
 RETURN (
-  SELECT respuesta___ 
+  SELECT resposta___ 
   FROM vector_search(
-    index => 'funcionesai.carga.faq_index', 
-    query => pregunta,
+    index => 'funcoesai.carga.faq_index', 
+    query => pergunta,
     num_results => 1
   )
   LIMIT 1
@@ -226,124 +226,75 @@ RETURN (
 
 -- COMMAND ----------
 
--- MAGIC %md ### D. Probar la función
+-- MAGIC %md ### D. Testar a funcao
 
 -- COMMAND ----------
 
-SELECT consultar_faq('¿Cuál es el plazo de devolución?') AS STRING
+SELECT consultar_faq('Qual e o prazo de devolucao?') AS STRING
 
 -- COMMAND ----------
 
-SELECT consultar_faq('¿Cómo emitir un duplicado?')
+SELECT consultar_faq('Como emitir uma segunda via?')
 
 -- COMMAND ----------
 
--- MAGIC %md ### E. Pruebe la función como herramienta.
+-- MAGIC %md ### E. Teste a funcao como ferramenta.
 -- MAGIC
--- MAGIC 1. En el **menú principal** de la izquierda, haz clic en **`Playground`**
--- MAGIC 2. Haga clic en el **selector de modelo** y seleccione el modelo **`Meta Llama 3.1 70B Instruct`** (si aún no está seleccionado)
--- MAGIC 3. Haga clic en **Tools** y luego en **Add Tools**
--- MAGIC 4. En **Hosted Function**, escriba `funcionesia.carga.consultar_faq`
--- MAGIC 5. Agregue la siguiente declaración:
+-- MAGIC 1. No **menu principal** a esquerda, clique em **`Playground`**
+-- MAGIC 2. Clique no **seletor de modelo** e selecione o modelo **`Meta Llama 3.1 70B Instruct`** (se ainda nao estiver selecionado)
+-- MAGIC 3. Clique em **Tools** e depois em **Add Tools**
+-- MAGIC 4. Em **Hosted Function**, digite `funcoesai.carga.consultar_faq`
+-- MAGIC 5. Adicione a seguinte declaracao:
 -- MAGIC  ```
--- MAGIC  ¿Cuál es el plazo de devolución?
+-- MAGIC  Qual e o prazo de devolucao?
 -- MAGIC  ```
--- MAGIC 6. Haga clic en el ícono **enviar**
+-- MAGIC 6. Clique no icone **enviar**
 
 -- COMMAND ----------
 
--- MAGIC %md ## Proporcionar recomendaciones de productos personalizadas basadas en sus descripciones.
+-- MAGIC %md ## Fornecer recomendacoes de produtos personalizadas com base em suas descricoes.
 -- MAGIC
--- MAGIC Finalmente, también nos gustaría crear una herramienta para ayudar a nuestros clientes a encontrar productos que tengan descripciones similares. Esta herramienta ayudará a los clientes que no están satisfechos con un producto y buscan un cambio.
+-- MAGIC Finalmente, tambem gostariamos de criar uma ferramenta para ajudar nossos clientes a encontrar produtos que tenham descricoes semelhantes. Esta ferramenta ajudara os clientes que nao estao satisfeitos com um produto e procuram uma troca.
 
 -- COMMAND ----------
 
--- MAGIC %md ### A. Habilite Change Data Feed en la tabla `productos`
+-- MAGIC %md ### A. Habilite o Change Data Feed na tabela `produtos`
 
 -- COMMAND ----------
 
-ALTER TABLE productos SET TBLPROPERTIES (delta.enableChangeDataFeed = true)
+ALTER TABLE produtos SET TBLPROPERTIES (delta.enableChangeDataFeed = true)
 
 -- COMMAND ----------
 
--- MAGIC %md ### B. Crear un índice en el Vector Search
+-- MAGIC %md ### B. Criar um indice no Vector Search
 -- MAGIC
--- MAGIC 1. En el **menú principal** de la izquierda, haga clic en **`Catálogo`**
--- MAGIC 2. Busca tu **tabla** `funcionesai.carga.productos`
--- MAGIC 3. Haga clic en `Create` y luego en `Vector search index`
--- MAGIC 4. Complete el formulario:
--- MAGIC  - **Nombre:** id
+-- MAGIC 1. No **menu principal** a esquerda, clique em **`Catalogo`**
+-- MAGIC 2. Busque sua **tabela** `funcoesai.carga.produtos`
+-- MAGIC 3. Clique em `Create` e depois em `Vector search index`
+-- MAGIC 4. Preencha o formulario:
+-- MAGIC  - **Nome:** id
 -- MAGIC  - **Primary key:** id
--- MAGIC  - **Endpoint**: seleccione el punto final deseado
--- MAGIC  - **Columns to sync:** dejar en blanco (sincroniza todas las columnas)
--- MAGIC  - **Fuente de incrustación:** Computar incrustaciones (Vector Search gestiona la indexación/creación de incrustaciones)
--- MAGIC  - **Embedding source:** descripción
+-- MAGIC  - **Endpoint**: selecione o endpoint desejado
+-- MAGIC  - **Columns to sync:** deixar em branco (sincroniza todas as colunas)
+-- MAGIC  - **Fonte de embedding:** Compute embeddings (Vector Search gerencia a indexacao/criacao de embeddings)
+-- MAGIC  - **Embedding source:** descricao
 -- MAGIC  - **Embedding model:** databricks-gte-large-en
--- MAGIC  - **Sync computed embeddings:** deshabilitado
--- MAGIC  - **Sync mode:** Activado
--- MAGIC 5. Haga clic en "Create".
--- MAGIC 6. Espere a que finalice la creación del índice.
+-- MAGIC  - **Sync computed embeddings:** desabilitado
+-- MAGIC  - **Sync mode:** Ativado
+-- MAGIC 5. Clique em "Create".
+-- MAGIC 6. Aguarde a criacao do indice finalizar.
 
 -- COMMAND ----------
 
--- MAGIC %md ### C. Crear la función
+-- MAGIC %md ### C. Criar a funcao
 
 -- COMMAND ----------
 
-CREATE OR REPLACE FUNCTION buscar_produtos_similares(descripcion STRING)
-RETURNS TABLE(id LONG, producto STRING, descripcion STRING, search_score DOUBLE)
-COMMENT 'Esta función recibe una descripción del producto, que se utiliza para buscar productos similares.'
-RETURN SELECT id, produto, descricao, search_score FROM (
-  SELECT *, ROW_NUMBER() OVER (ORDER BY search_score DESC) AS rn
-  FROM vector_search(
-    index => 'funcionesai.carga.productos_index',
-    query => buscar_produtos_similares.descripcion,
-    num_results => 10)
-  WHERE search_score BETWEEN 0.003 AND 0.99
-) WHERE rn <= 3
+CREATE OR REPLACE FUNCTION bus
 
--- COMMAND ----------
-
--- MAGIC %md ### D. Probar la función
-
--- COMMAND ----------
-
-SELECT * FROM buscar_produtos_similares('Los auriculares DEF son un dispositivo de audio diseñado para brindar una experiencia de sonido envolvente y de alta calidad. Con controladores de alta fidelidad y tecnología de cancelación de ruido, te permite perderte en la música o los detalles de un podcast sin distracciones. Además, su diseño ergonómico garantiza comodidad durante un uso prolongado.')
-
--- COMMAND ----------
-
--- MAGIC %md ### E. Probar la función como herramienta
--- MAGIC
--- MAGIC 1. En el **menú principal** de la izquierda, haz clic en **`Playground`**
--- MAGIC 2. Haga clic en el **selector de modelo** y seleccione el modelo **`Meta Llama 3.1 70B Instruct`** (si aún no está seleccionado)
--- MAGIC 3. Haga clic en **Tools** y luego en **Add tools**
--- MAGIC 4. En **Hosted function**, escriba `funcionesai.carga.buscar_produtos_similares`
--- MAGIC 5. Agregue la siguiente declaración:
--- MAGIC  ```
--- MAGIC  ¿Qué tabletas tienen buena calidad de pantalla?
--- MAGIC  ```
--- MAGIC 6. Haga clic en el ícono **enviar**
-
--- COMMAND ----------
-
--- MAGIC %md ## Probando a nuestro agente
--- MAGIC
--- MAGIC 1. En el **menú principal** de la izquierda, haz clic en **`Playground`**
--- MAGIC 2. Haga clic en el **selector de modelo** y seleccione el modelo **`Meta Llama 3.1 70B Instruct`** (si aún no está seleccionado)
--- MAGIC 3. Haga clic en **Tools** y luego en **Add tools**
--- MAGIC 4. En **Hosted Function**, escriba `funcionesai.carga.*` para agregar todas las funciones creadas.
--- MAGIC 5. En **System Prompt**, escriba: <br>
--- MAGIC `Eres un asistente virtual para un comercio electrónico. Para responder preguntas, el cliente debe proporcionar su cédula. Si aún no tiene esta información, solicite cortésmente su cédula. Podrás resolver dudas sobre entrega, devoluciones de productos, estado de pedidos, entre otras. Si no sabe cómo responder la pregunta, diga que no lo sabe. No inventes ni especules sobre nada. Siempre que se le pregunte sobre procedimientos, consulte nuestra base de conocimientos.`
--- MAGIC 6. Escribe "¡Hola!"
--- MAGIC 7. Ingrese `000.000.000-01`
--- MAGIC 8. Escriba "Compré una tableta DEF, pero la calidad de la pantalla es muy mala".
--- MAGIC 9. Escriba "¿Podría recomendar productos similares?"
--- MAGIC 10. Escriba "¿Cómo solicito un cambio?"
-
--- COMMAND ----------
-
--- MAGIC %md # ¡Felicidades!
--- MAGIC
--- MAGIC ¡Has completado el laboratorio de **Agentes**!
--- MAGIC
--- MAGIC ¡Ahora ya sabes cómo utilizar Foundation Models, Playground y las herramientas de catálogo de Unity para crear prototipos de forma rápida y sencilla de agentes capaces de responder con precisión preguntas complejas!
+Citations:
+[1] https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/14131051/4679cd05-065e-4d03-a6aa-b3a4b00830e4/paste.txt
+[2] https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/14131051/37403a55-48cc-4c3c-9960-8d0ac404ada4/paste-2.txt
+[3] https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/14131051/a1db1307-c414-4a4f-aa54-f81ef3f571ec/paste-3.txt
+[4] https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/14131051/1d0d5551-07e5-4888-88c6-e256c011f96a/paste-4.txt
+[5] https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/14131051/4679cd05-065e-4d03-a6aa-b3a4b00830e4/paste.txt
