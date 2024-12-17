@@ -1,4 +1,3 @@
-
 -- Databricks notebook source
 -- MAGIC %md <img src="https://github.com/Databricks-BR/lab_genai/blob/main/img/header.png?raw=true" width=100%>
 -- MAGIC
