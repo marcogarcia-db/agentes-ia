@@ -1,9 +1,7 @@
 -- Databricks notebook source
--- MAGIC %md <img src="https://github.com/Databricks-BR/lab_genai/blob/main/img/header.png?raw=true" width=100%>
 -- MAGIC
--- MAGIC # Hands-On LAB 03 - Usando Agentes
+-- MAGIC # Hands-On LAB 02 - Usando Agentes de IA
 -- MAGIC
--- MAGIC Treinamento Hands-on na plataforma Databricks com foco nas funcionalidades de IA Generativa.
 
 -- COMMAND ----------
 
@@ -36,7 +34,7 @@
 
 -- COMMAND ----------
 
--- MAGIC %md ## Exercício 03.01 - Usando Unity Catalog Tools
+-- MAGIC %md ## Exercício 02.01 - Usando Unity Catalog Tools
 -- MAGIC
 -- MAGIC O primeiro passo na construção do nosso agente será entender como utilizar **Unity Catalog Tools**.
 -- MAGIC
@@ -59,7 +57,7 @@
 
 -- COMMAND ----------
 
--- MAGIC %md ## Exercício 03.02 - Consultando dados do cliente
+-- MAGIC %md ## Exercício 02.02 - Consultando dados do cliente
 -- MAGIC
 -- MAGIC Ferramentas podem ser utilizadas em diversos cenários, como por exemplo:
 -- MAGIC
@@ -170,6 +168,8 @@ ALTER TABLE faq SET TBLPROPERTIES (delta.enableChangeDataFeed = true)
 -- COMMAND ----------
 
 -- MAGIC %md ### C. Criar a função
+-- MAGIC %md ### Importante - verifique o catalogo.schema e tenha certeza do VSI no ar
+    
 
 -- COMMAND ----------
 
@@ -177,7 +177,7 @@ CREATE OR REPLACE FUNCTION consultar_faq(pergunta STRING)
 RETURNS TABLE(id LONG, pergunta STRING, resposta STRING, search_score DOUBLE)
 COMMENT 'Use esta função para consultar a base de conhecimento sobre prazos de entrega, pedidos de troca ou devolução, entre outras perguntas frequentes sobre o nosso marketplace'
 RETURN select * from vector_search(
-  index => 'academy.<seu_nome>.faq_index', 
+  index => 'funcoes_ia.carga.faq_index', 
   query => consultar_faq.pergunta,
   num_results => 1
 )
@@ -209,8 +209,10 @@ SELECT * FROM consultar_faq('Como emitir a segunda via?')
 -- MAGIC 6. Clique no ícone **enviar**
 
 -- COMMAND ----------
-
--- MAGIC %md ## Exercício 03.04 - Fornecendo recomendações personalizadas de produtos com base em suas descrições
+-- MAGIC %md ## OS PROXIMOS EXERCICIOS SAO ADICIONAIS AO LABORATORIO DE HOJE
+-- MAGIC  
+-- MAGIC  
+-- MAGIC %md ## Exercício 02.04 - Fornecendo recomendações personalizadas de produtos com base em suas descrições ( ADICIONAL )
 -- MAGIC
 -- MAGIC Por fim, também gostaríamos de criar uma ferramenta para auxiliar nossos clientes a encontrarem produtos que possuam descrições similares. Essa ferramenta irá auxiliar clientes que estejam insatisfeitos com algum produto e estejam buscando uma troca.
 -- MAGIC
