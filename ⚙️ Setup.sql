@@ -7,17 +7,17 @@
 -- COMMAND ----------
 
 -- DBTITLE 1,Criar a estrutura central
-CREATE CATALOG IF NOT EXISTS funcoesai;
+CREATE CATALOG IF NOT EXISTS funcoes_ia;
 
-CREATE SCHEMA IF NOT EXISTS `funcoesai`.`carga`;
+CREATE SCHEMA IF NOT EXISTS `funcoes_ia`.`carga`;
 
-CREATE VOLUME IF NOT EXISTS `funcoesai`.`carga`.`arquivos`; 
+CREATE VOLUME IF NOT EXISTS `funcoes_ia`.`carga`.`arquivos`; 
 
 -- COMMAND ----------
 
 -- DBTITLE 1,Carregar tabela Produtos
 -- MAGIC %python
--- MAGIC catalog = "funcoesai"
+-- MAGIC catalog = "funcoes_ia"
 -- MAGIC schema = "carga"
 -- MAGIC volume = "arquivos"
 -- MAGIC
@@ -43,7 +43,7 @@ CREATE VOLUME IF NOT EXISTS `funcoesai`.`carga`.`arquivos`;
 
 -- DBTITLE 1,Carregar tabela faq
 -- MAGIC %python
--- MAGIC catalog = "funcoesai"
+-- MAGIC catalog = "funcoes_ia"
 -- MAGIC schema = "carga"
 -- MAGIC volume = "arquivos"
 -- MAGIC
@@ -77,7 +77,7 @@ CREATE VOLUME IF NOT EXISTS `funcoesai`.`carga`.`arquivos`;
 
 -- DBTITLE 1,Carregar tabela Opinioes
 -- MAGIC %python
--- MAGIC catalog = "funcoesai"
+-- MAGIC catalog = "funcoes_ia"
 -- MAGIC schema = "carga"
 -- MAGIC volume = "arquivos"
 -- MAGIC
@@ -105,7 +105,7 @@ CREATE VOLUME IF NOT EXISTS `funcoesai`.`carga`.`arquivos`;
 
 -- DBTITLE 1,Carregar tabela Clientes
 -- MAGIC %python
--- MAGIC catalog = "funcoesai"
+-- MAGIC catalog = "funcoes_ia"
 -- MAGIC schema = "carga"
 -- MAGIC volume = "arquivos"
 -- MAGIC
@@ -143,7 +143,7 @@ MAGIC download_url = "https://raw.githubusercontent.com/mousastech/iafunciones/r
 -- MAGIC opinioes = "https://github.com/marcogarcia-db/agentes-ia/tree/main/dados/opinioes.csv"
 -- MAGIC clientes = "https://github.com/marcogarcia-db/agentes-ia/tree/main/dados/clientes.csv"
 -- MAGIC
--- MAGIC catalog = "funcoesai"
+-- MAGIC catalog = "funcoes_ia"
 -- MAGIC schema = "carga"
 -- MAGIC volume = "arquivos"
 -- MAGIC
@@ -172,7 +172,7 @@ MAGIC download_url = "https://raw.githubusercontent.com/mousastech/iafunciones/r
 -- MAGIC import os
 -- MAGIC
 -- MAGIC # Definir o caminho do volume e o catalogo e esquema de destino
--- MAGIC volume_path = "/Volumes/funcoesai/carga/arquivos/avaliacoes.csv"
+-- MAGIC volume_path = "/Volumes/funcoes_ia/carga/arquivos/avaliacoes.csv"
 -- MAGIC catalog = "tutorial"
 -- MAGIC schema = "carga"
 -- MAGIC
