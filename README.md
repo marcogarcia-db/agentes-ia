@@ -1,5 +1,3 @@
-<img src="https://github.com/mousastech/agentes_ia/blob/a6db91737186d6d21d7808bb9950b154376d1d69/img/headertools_aiagents.png?raw=true" width=100%>
-
 # Databricks AI Systems - Agentes de IA 
 
 ## Objetivo
@@ -18,21 +16,10 @@ Em um nível alto, você cria e apresenta um conjunto de funções personalizada
 - Execute as funções de forma segura
 - Raciocine sobre as ferramentas que selecionou e encadeie-as para responder adequadamente à sua pergunta
 
-## Aviso
-
-- Unity Catalog é necessário
-- A criação de Vector Search é necessária
-- A utilização de LLMs é necessária
-
-## Detalhes de Implementação
-
-<img src="https://github.com/mousastech/agentes_ia/blob/e4602f57c4a83b171c7c541e11244136cdd80816/img/llm-call.png?raw=true" width="100%">
-
 ## Configuração e Uso
 
-1. Fazer a configuração das tabelas (se ainda não foi feito) - notebook **Setup**
-2. Executar o notebook para a criação dos componentes
-3. Criar os índices no Vector Search
+1. Verifique o notebook de **00.Requisitos** antes de Iniciar
+2. Fazer a configuração das tabelas (se ainda não foi feito) - notebook **01.Setup**
+3. Vamos rodar as primeiras análises em **02.Analises Iniciais**
+4. Vamos para **03.Agentes de IA**
 
-Citations:
-[1] https://github.com/mousastech/agentes_ia/blob/a6db91737186d6d21d7808bb9950b154376d1d69/img/headertools_aiagents.png?raw=true
