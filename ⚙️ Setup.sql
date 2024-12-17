@@ -36,6 +36,12 @@ CREATE VOLUME IF NOT EXISTS `funcoes_ia`.`carga`.`arquivos`;
 -- MAGIC   inferSchema=True,
 -- MAGIC   sep=",",
 -- MAGIC   encoding="UTF-8")
+-- MAGIC # Renomear colunas para remover caracteres invalidos
+-- MAGIC for col in df.columns:
+-- MAGIC     new_col = col.replace(" ", "_").replace(";", "_").replace("{", "_").replace("}", "_") \
+-- MAGIC                  .replace("(", "_").replace(")", "_").replace("\n", "_").replace("\t", "_") \
+-- MAGIC                  .replace("=", "_")
+-- MAGIC     df = df.withColumnRenamed(col, new_col)
 -- MAGIC
 -- MAGIC df.write.mode("overwrite").saveAsTable(f"{path_table}.{table_name}")
 
@@ -47,7 +53,7 @@ CREATE VOLUME IF NOT EXISTS `funcoes_ia`.`carga`.`arquivos`;
 -- MAGIC schema = "carga"
 -- MAGIC volume = "arquivos"
 -- MAGIC
--- MAGIC download_url = "https://github.com/marcogarcia-db/agentes-ia/tree/main/dadosfaq.csv"
+-- MAGIC download_url = "https://github.com/marcogarcia-db/agentes-ia/tree/main/dados/faq.csv"
 -- MAGIC file_name = "faq.csv"
 -- MAGIC table_name = "faq"
 -- MAGIC path_volume = "/Volumes/" + catalog + "/" + schema + "/" + volume
@@ -81,9 +87,9 @@ CREATE VOLUME IF NOT EXISTS `funcoes_ia`.`carga`.`arquivos`;
 -- MAGIC schema = "carga"
 -- MAGIC volume = "arquivos"
 -- MAGIC
--- MAGIC download_url = "https://github.com/marcogarcia-db/agentes-ia/tree/main/dados/opinioes.csv"
--- MAGIC file_name = "opinioes.csv"
--- MAGIC table_name = "opinioes"
+-- MAGIC download_url = "https://github.com/marcogarcia-db/agentes-ia/tree/main/dados/avaliacoes.csv"
+-- MAGIC file_name = "avaliacoes.csv"
+-- MAGIC table_name = "avaliacoes"
 -- MAGIC path_volume = "/Volumes/" + catalog + "/" + schema + "/" + volume
 -- MAGIC path_table = catalog + "." + schema
 -- MAGIC print(path_table) # Mostrar o caminho completo
@@ -109,7 +115,7 @@ CREATE VOLUME IF NOT EXISTS `funcoes_ia`.`carga`.`arquivos`;
 -- MAGIC schema = "carga"
 -- MAGIC volume = "arquivos"
 -- MAGIC
-MAGIC download_url = "https://raw.githubusercontent.com/mousastech/iafunciones/refs/heads/main/data/clientes.csv"
+-- MAGIC download_url = "https://raw.githubusercontent.com/mousastech/iafunciones/refs/heads/main/data/clientes.csv"
 -- MAGIC file_name = "clientes.csv"
 -- MAGIC table_name = "clientes"
 -- MAGIC path_volume = "/Volumes/" + catalog + "/" + schema + "/" + volume
@@ -139,8 +145,8 @@ MAGIC download_url = "https://raw.githubusercontent.com/mousastech/iafunciones/r
 -- DBTITLE 1,Limpeza por tema de reprocessamento
 -- MAGIC %python
 -- MAGIC produtos = "https://github.com/marcogarcia-db/agentes-ia/tree/main/dados/produtos.csv"
--- MAGIC faq = "https://github.com/marcogarcia-db/agentes-ia/tree/main/dados/faq.csv"
--- MAGIC opinioes = "https://github.com/marcogarcia-db/agentes-ia/tree/main/dados/opinioes.csv"
+-- MAGIC faq      = "https://github.com/marcogarcia-db/agentes-ia/tree/main/dados/faq.csv"
+-- MAGIC opinioes = "https://github.com/marcogarcia-db/agentes-ia/tree/main/dados/avaliacoes.csv"
 -- MAGIC clientes = "https://github.com/marcogarcia-db/agentes-ia/tree/main/dados/clientes.csv"
 -- MAGIC
 -- MAGIC catalog = "funcoes_ia"
