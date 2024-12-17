@@ -1,8 +1,10 @@
 -- Databricks notebook source
 -- MAGIC %md
--- MAGIC <img src="https://github.com/mousastech/iafunciones/blob/fd139cf6a61d68b2858b91907d3885cce238cf5d/img/headertools_aifunctions.png?raw=true" width=100%>
+-- MAGIC 
 -- MAGIC
 -- MAGIC Executar apenas no momento da criacao para gerar um catalogo de testes e tabelas utilizadas neste laboratorio.
+-- MAGIC 
+-- MAGIC
 
 -- COMMAND ----------
 
@@ -124,7 +126,7 @@ CREATE VOLUME IF NOT EXISTS `funcoes_ia`.`carga`.`arquivos`;
 -- MAGIC schema = "carga"
 -- MAGIC volume = "arquivos"
 -- MAGIC
--- MAGIC download_url = "https://raw.githubusercontent.com/mousastech/iafunciones/refs/heads/main/data/clientes.csv"
+-- MAGIC download_url = "https://github.com/marcogarcia-db/agentes-ia/tree/main/dados/clientes.csv"
 -- MAGIC file_name = "clientes.csv"
 -- MAGIC table_name = "clientes"
 -- MAGIC path_volume = "/Volumes/" + catalog + "/" + schema + "/" + volume
@@ -217,5 +219,4 @@ CREATE VOLUME IF NOT EXISTS `funcoes_ia`.`carga`.`arquivos`;
 -- MAGIC
 -- MAGIC     print(f"Tabela {catalog}.{schema}.{table_name} criada com sucesso.")
 
-Citations:
-[1] https://github.com/mousastech/iafunciones/blob/fd139cf6a61d68b2858b91907d3885cce238c
+
