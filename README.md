@@ -1,6 +1,8 @@
-# Databricks AI Systems - Agentes de IA 
+# Modernize seu Data Warehouse com IA
 
 ## Objetivo
+
+Nesse laboratório vamos passar por algumas técnicas que podem ser muito interessantes para aliar o uso da Inteligência Artificial aos Data Warehouses Atuais.
 
 Os LLMs são excelentes para responder perguntas gerais. No entanto, a inteligência geral por si só não é suficiente para oferecer valor aos seus clientes.
 
@@ -21,5 +23,5 @@ Em um nível alto, você cria e apresenta um conjunto de funções personalizada
 1. Verifique o notebook de **00.Requisitos** antes de Iniciar
 2. Fazer a configuração das tabelas (se ainda não foi feito) - notebook **01.Setup**
 3. Vamos rodar as primeiras análises em **02.Analises Iniciais**
-4. Vamos para **03.Agentes de IA**
+4. Depois Vamos para **03.Agentes de IA**
 
