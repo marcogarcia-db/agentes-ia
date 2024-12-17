@@ -47,8 +47,11 @@
 
 -- COMMAND ----------
 
--- MAGIC %md ### A. Selecionar o database que criamos anteriormente
--- MAGIC %md ### Caso você tenha usado outro nome de catalogo.repositorio - modifique abaixo
+
+
+-- MAGIC %md
+-- MAGIC ### A. Selecionar o database que criamos anteriormente
+-- MAGIC ### Caso você tenha usado outro nome de catalogo.repositorio - modifique abaixo
 
 -- COMMAND ----------
 
