@@ -1,7 +1,7 @@
 -- Databricks notebook source
 -- MAGIC %md
 -- MAGIC 
--- MAGIC
+-- MAGIC # Criação dos objetos - catalogo, schema e tabelas
 -- MAGIC Executar apenas no momento da criacao para gerar um catalogo de testes e tabelas utilizadas neste laboratorio.
 -- MAGIC 
 -- MAGIC
