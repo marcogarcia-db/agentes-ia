@@ -1,5 +1,5 @@
--- MAGIC %md
 -- Databricks notebook source
+-- MAGIC %md
 -- MAGIC
 -- MAGIC # Hands-On LAB 01 - Análise de sentimento, extração de entidades e geração de texto
 -- MAGIC
