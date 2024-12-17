@@ -1,9 +1,8 @@
 -- Databricks notebook source
--- MAGIC %md <img src="https://github.com/Databricks-BR/lab_genai/blob/main/img/header.png?raw=true" width=100%>
 -- MAGIC
--- MAGIC # Hands-On LAB 02 - Análise de sentimento, extração de entidades e geração de texto
+-- MAGIC # Hands-On LAB 01 - Análise de sentimento, extração de entidades e geração de texto
 -- MAGIC
--- MAGIC Treinamento Hands-on na plataforma Databricks com foco nas funcionalidades de IA Generativa.
+-- MAGIC Modernize seu Data Warehouse com IA - Laboratório 01
 
 -- COMMAND ----------
 
@@ -35,7 +34,7 @@
 
 -- COMMAND ----------
 
--- MAGIC %md ## Exercício 02.01 - Acessando o conjunto de dados
+-- MAGIC %md ## Exercício 01.01 - Acessando o conjunto de dados
 -- MAGIC
 -- MAGIC Agora, vamos acessar as avaliações de produto que carregamos no laboratório anterior.
 -- MAGIC
@@ -48,10 +47,11 @@
 -- COMMAND ----------
 
 -- MAGIC %md ### A. Selecionar o database que criamos anteriormente
+-- MAGIC %md ### Caso você tenha usado outro nome de catalogo.repositorio - modifique abaixo
 
 -- COMMAND ----------
 
-USE academy.<seu_nome>
+USE funcoes_ia.carga;
 
 -- COMMAND ----------
 
@@ -196,91 +196,10 @@ SELECT *, ai_query(
   concat('Se o sentimento da avaliação for negativo, liste os motivos de insatisfação. Avaliação: ', avaliacao)) AS motivo_insatisfacao 
 FROM avaliacoes LIMIT 10
 
--- COMMAND ----------
-
--- MAGIC %md ### 4. Analisando sentimento e extraindo entidades em escala
--- MAGIC
--- MAGIC Ter que especificar as instruções várias vezes acaba sendo trabalhoso, especialmente para Analistas de Dados que deveriam focar em analisar os resultados dessa extração.
--- MAGIC
--- MAGIC Para simplificar o acesso à essa inteligência, criaremos uma função SQL para encapsular esse processo e poder apenas informar em qual coluna do nosso conjunto de dados gostaríamos de aplicá-la.
--- MAGIC
--- MAGIC Aqui, vamos aproveitar para enviar uma única consulta ao nosso modelo para extrair todas as informações de uma única vez!
--- MAGIC
--- MAGIC <img src="https://raw.githubusercontent.com/databricks-demos/dbdemos-resources/main/images/product/sql-ai-functions/sql-ai-query-function-review-wrapper.png" width="1200px">
 
 -- COMMAND ----------
 
--- MAGIC %md #### A. Criando uma função para extrair todas as informações
-
--- COMMAND ----------
-
-CREATE OR REPLACE FUNCTION REVISAR_AVALIACAO(avaliacao STRING)
-RETURNS STRUCT<produto_nome: STRING, produto_categoria: STRING, sentimento: STRING, resposta: STRING, resposta_motivo: STRING>
-RETURN FROM_JSON(
-  AI_QUERY(
-    'databricks-meta-llama-3-1-70b-instruct',
-    CONCAT(
-      'Um cliente fez uma avaliação. Nós respondemos todos que aparentem descontentes.
-      Extraia as seguintes informações:
-      - extraia o nome do produto
-      - extraia a categoria de produto, por exemplo: tablet, notebook, smartphone
-      - classifique o sentimento como ["POSITIVO","NEGATIVO","NEUTRO"]
-      - retorne se o sentimento é NEGATIVO e precisa de responsta: S ou N
-      - se o sentimento é NEGATIVO, explique quais os principais motivos
-      Retorne somente um JSON. Nenhum outro texto fora o JSON. Formato do JSON:
-      {
-        "produto_nome": <entidade nome>,
-        "produto_categoria": <entidade categoria>,
-        "sentimento": <entidade sentimento>,
-        "resposta": <S ou N para resposta>,
-        "motivo": <motivos de insatisfação>
-      }
-      Avaliação: ', avaliacao
-    )
-  ),
-  "STRUCT<produto_nome: STRING, produto_categoria: STRING, sentimento: STRING, resposta: STRING, motivo: STRING>"
-)
-
--- COMMAND ----------
-
--- MAGIC %md #### B. Testando a análise das avaliações
-
--- COMMAND ----------
-
-SELECT revisar_avaliacao('Comprei um tablet ASD e estou muito insatisfeito com a qualidade da bateria. Ela dura muito pouco tempo e demora muito para carregar.') AS resultado
-
--- COMMAND ----------
-
--- MAGIC %md #### C. Analisando todas as avaliações
-
--- COMMAND ----------
-
--- CREATE TABLE avaliacoes_revisadas AS
-SELECT *, resultado.* FROM (
-  SELECT *, revisar_avaliacao(avaliacao) as resultado FROM avaliacoes LIMIT 10)
-
--- COMMAND ----------
-
--- MAGIC %md Agora, todos os nossos usuários podem aproveitar nossa função que foi cuidadosamente preparada para analisar nossas avaliações de produtos.
--- MAGIC
--- MAGIC E podemos escalar esse processo facilmente aplicando essa função sobre todo o nosso conjunto de dados!
-
--- COMMAND ----------
-
--- MAGIC %md ### 5. Analisando os dados enriquecidos
--- MAGIC
--- MAGIC Com as informações extraídas nos laboratórios anteriores, nossos times de negócio podem aproveitar para analisar as avaliações de produtos facilmente – já que agora temos todos os dados estruturados dentro de uma simples tabela.
--- MAGIC
--- MAGIC A partir dessa base de dados enriquecida criada, podemos construir análises ad-hoc, dashboards e alertas diretamente do Databricks. E, para facilitar ainda mais a vida dos nossos analistas, podemos fazer isso usando somente linguagem natural!
--- MAGIC
--- MAGIC Aqui vamos explorar como utilizar a **Genie** para analisar nossas avaliações de produto.
--- MAGIC
--- MAGIC <br>
--- MAGIC <img src="https://raw.githubusercontent.com/databricks-demos/dbdemos-resources/main/images/product/sql-ai-functions/sql-ai-function-flow.png" width="1000">
-
--- COMMAND ----------
-
--- MAGIC %md #### A. Criando a Genie
+-- MAGIC %md #### A. Criando a Genie ( OPCIONAL )
 -- MAGIC
 -- MAGIC Vamos começar criando a Genie para fazer nossas perguntas. Para isso, vamos seguir os passos abaixo:
 -- MAGIC
@@ -331,51 +250,9 @@ SELECT *, resultado.* FROM (
 
 -- COMMAND ----------
 
--- MAGIC %md ### A. Criando uma função para gerar um exemplo de resposta
 
--- COMMAND ----------
-
-CREATE OR REPLACE FUNCTION GERAR_RESPOSTA(nome STRING, sobrenome STRING, num_pedidos INT, produto STRING, motivo STRING)
-RETURNS TABLE(resposta STRING)
-COMMENT 'Caso o cliente demonstre insatisfação com algum produto, use esta função para gerar uma resposta personalizada'
-RETURN SELECT AI_QUERY(
-    'databricks-meta-llama-3-1-70b-instruct',
-    CONCAT(
-        "Você é um assistente virtual de um e-commerce. Nosso cliente, ", gerar_resposta.nome, " ", gerar_resposta.sobrenome, " que comprou ", gerar_resposta.num_pedidos, " produtos este ano estava insatisfeito com o produto ", gerar_resposta.produto, 
-        ", pois ", gerar_resposta.motivo, ". Forneça uma breve mensagem empática para o cliente incluindo a oferta de troca do produto, caso  esteja em conformidade com a nossa política de trocas. A troca pode ser feita diretamente por esse assistente. ",
-        "Eu quero recuperar sua confiança e evitar que ele deixe de ser nosso cliente. ",
-        "Escreva uma mensagem com poucas sentenças. ",
-        "Não adicione nenhum texto além da mensagem. ",
-        "Não adicione nenhuma assinatura."
-    )
-)
-
--- COMMAND ----------
-
--- MAGIC %md ### B. Gerando respostas automatizadas para todas as avaliações negativas
-
--- COMMAND ----------
-
--- CREATE TABLE respostas AS
-
-WITH avaliacoes_enriq AS (
-  SELECT a.*, c.* EXCEPT (c.id_cliente) 
-  FROM avaliacoes_revisadas a 
-  LEFT JOIN clientes c 
-  ON a.id_cliente = c.id_cliente 
-  WHERE a.resposta = 'S' 
-  LIMIT 10
-)
-
-SELECT 
-  *, 
-  (SELECT * FROM gerar_resposta(e.nome, e.sobrenome, e.num_pedidos, e.produto_nome, e.resposta_motivo)) AS rascunho 
-FROM avaliacoes_enriq e
-
--- COMMAND ----------
-
+-- COMMAND ---------
 -- MAGIC %md # Parabéns!
 -- MAGIC
 -- MAGIC Você concluiu o laboratório de **Extração de informações e geração de texto**!
 -- MAGIC
--- MAGIC Agora, você já sabe como utilizar a Foundation Models, Playground e AI Functions para analisar o sentimento e identificar entidades em avaliações de produtos de forma simples e escalável!
