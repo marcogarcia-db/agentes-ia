@@ -36,6 +36,7 @@ CREATE VOLUME IF NOT EXISTS `funcoes_ia`.`carga`.`arquivos`;
 -- MAGIC   inferSchema=True,
 -- MAGIC   sep=",",
 -- MAGIC   encoding="UTF-8")
+-- MAGIC
 -- MAGIC # Renomear colunas para remover caracteres invalidos
 -- MAGIC for col in df.columns:
 -- MAGIC     new_col = col.replace(" ", "_").replace(";", "_").replace("{", "_").replace("}", "_") \
@@ -103,6 +104,14 @@ CREATE VOLUME IF NOT EXISTS `funcoes_ia`.`carga`.`arquivos`;
 -- MAGIC   sep=",",
 -- MAGIC   encoding="UTF-8")
 -- MAGIC
+-- MAGIC # Renomear colunas para remover caracteres invalidos
+-- MAGIC for col in df.columns:
+-- MAGIC     new_col = col.replace(" ", "_").replace(";", "_").replace("{", "_").replace("}", "_") \
+-- MAGIC                  .replace("(", "_").replace(")", "_").replace("\n", "_").replace("\t", "_") \
+-- MAGIC                  .replace("=", "_")
+-- MAGIC     df = df.withColumnRenamed(col, new_col)
+-- MAGIC
+-- MAGIC
 -- MAGIC df.write.mode("overwrite").saveAsTable(f"{path_table}.{table_name}")
 -- MAGIC
 -- MAGIC display(df)
@@ -130,6 +139,13 @@ CREATE VOLUME IF NOT EXISTS `funcoes_ia`.`carga`.`arquivos`;
 -- MAGIC   inferSchema=True,
 -- MAGIC   sep=",",
 -- MAGIC   encoding="UTF-8")
+-- MAGIC
+-- MAGIC # Renomear colunas para remover caracteres invalidos
+-- MAGIC for col in df.columns:
+-- MAGIC     new_col = col.replace(" ", "_").replace(";", "_").replace("{", "_").replace("}", "_") \
+-- MAGIC                  .replace("(", "_").replace(")", "_").replace("\n", "_").replace("\t", "_") \
+-- MAGIC                  .replace("=", "_")
+-- MAGIC     df = df.withColumnRenamed(col, new_col)
 -- MAGIC
 -- MAGIC df.write.mode("overwrite").saveAsTable(f"{path_table}.{table_name}")
 -- MAGIC
