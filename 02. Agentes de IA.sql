@@ -1,5 +1,5 @@
 -- Databricks notebook source
--- MAGIC
+-- MAGIC %md
 -- MAGIC # Hands-On LAB 02 - Usando Agentes de IA
 -- MAGIC
 
