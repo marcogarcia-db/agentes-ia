@@ -21,7 +21,7 @@ CREATE VOLUME IF NOT EXISTS `funcoesai`.`carga`.`arquivos`;
 -- MAGIC schema = "carga"
 -- MAGIC volume = "arquivos"
 -- MAGIC
--- MAGIC download_url = "https://raw.githubusercontent.com/mousastech/iafunciones/refs/heads/main/data/produtos.csv"
+-- MAGIC download_url = "https://github.com/marcogarcia-db/agentes-ia/tree/main/dados/produtos.csv"
 -- MAGIC file_name = "produtos.csv"
 -- MAGIC table_name = "produtos"
 -- MAGIC path_volume = "/Volumes/" + catalog + "/" + schema + "/" + volume
@@ -47,7 +47,7 @@ CREATE VOLUME IF NOT EXISTS `funcoesai`.`carga`.`arquivos`;
 -- MAGIC schema = "carga"
 -- MAGIC volume = "arquivos"
 -- MAGIC
--- MAGIC download_url = "https://raw.githubusercontent.com/mousastech/iafunciones/refs/heads/main/data/faq.csv"
+-- MAGIC download_url = "https://github.com/marcogarcia-db/agentes-ia/tree/main/dadosfaq.csv"
 -- MAGIC file_name = "faq.csv"
 -- MAGIC table_name = "faq"
 -- MAGIC path_volume = "/Volumes/" + catalog + "/" + schema + "/" + volume
@@ -81,7 +81,7 @@ CREATE VOLUME IF NOT EXISTS `funcoesai`.`carga`.`arquivos`;
 -- MAGIC schema = "carga"
 -- MAGIC volume = "arquivos"
 -- MAGIC
--- MAGIC download_url = "https://raw.githubusercontent.com/mousastech/iafunciones/refs/heads/main/data/opinioes.csv"
+-- MAGIC download_url = "https://github.com/marcogarcia-db/agentes-ia/tree/main/dados/opinioes.csv"
 -- MAGIC file_name = "opinioes.csv"
 -- MAGIC table_name = "opinioes"
 -- MAGIC path_volume = "/Volumes/" + catalog + "/" + schema + "/" + volume
@@ -109,7 +109,7 @@ CREATE VOLUME IF NOT EXISTS `funcoesai`.`carga`.`arquivos`;
 -- MAGIC schema = "carga"
 -- MAGIC volume = "arquivos"
 -- MAGIC
--- MAGIC download_url = "https://raw.githubusercontent.com/mousastech/iafunciones/refs/heads/main/data/clientes.csv"
+MAGIC download_url = "https://raw.githubusercontent.com/mousastech/iafunciones/refs/heads/main/data/clientes.csv"
 -- MAGIC file_name = "clientes.csv"
 -- MAGIC table_name = "clientes"
 -- MAGIC path_volume = "/Volumes/" + catalog + "/" + schema + "/" + volume
@@ -138,10 +138,10 @@ CREATE VOLUME IF NOT EXISTS `funcoesai`.`carga`.`arquivos`;
 
 -- DBTITLE 1,Limpeza por tema de reprocessamento
 -- MAGIC %python
--- MAGIC produtos = "https://github.com/mousastech/iafunciones/blob/main/data/produtos.csv"
--- MAGIC faq = "https://raw.githubusercontent.com/mousastech/iafunciones/refs/heads/main/data/faq.csv"
--- MAGIC opinioes = "https://github.com/mousastech/iafunciones/blob/main/data/opinioes.csv"
--- MAGIC clientes = "https://raw.githubusercontent.com/mousastech/iafunciones/refs/heads/main/data/clientes.csv"
+-- MAGIC produtos = "https://github.com/marcogarcia-db/agentes-ia/tree/main/dados/produtos.csv"
+-- MAGIC faq = "https://github.com/marcogarcia-db/agentes-ia/tree/main/dados/faq.csv"
+-- MAGIC opinioes = "https://github.com/marcogarcia-db/agentes-ia/tree/main/dados/opinioes.csv"
+-- MAGIC clientes = "https://github.com/marcogarcia-db/agentes-ia/tree/main/dados/clientes.csv"
 -- MAGIC
 -- MAGIC catalog = "funcoesai"
 -- MAGIC schema = "carga"
