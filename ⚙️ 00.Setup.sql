@@ -8,7 +8,8 @@
 
 -- COMMAND ----------
 
--- DBTITLE 1,Criar a estrutura central
+-- DBTITLE 1,Criar a estrutura central - esses nomes são sugeridos, você pode alterar e utilizar uma outra nomenclatura
+--
 CREATE CATALOG IF NOT EXISTS funcoes_ia;
 
 CREATE SCHEMA IF NOT EXISTS `funcoes_ia`.`carga`;
