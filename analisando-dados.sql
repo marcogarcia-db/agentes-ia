@@ -1,3 +1,4 @@
+
 -- Databricks notebook source
 -- MAGIC %md <img src="https://github.com/Databricks-BR/lab_genai/blob/main/img/header.png?raw=true" width=100%>
 -- MAGIC
@@ -173,7 +174,7 @@ SELECT * FROM clientes
 
 -- COMMAND ----------
 
-SELECT  /* complete a query com uma AI Function para analisar o sentimento da avaliação */ FROM avaliacoes LIMIT 10
+SELECT *, ai_analyze_sentiment(avaliacao) AS sentimento FROM avaliacoes LIMIT 10
 
 -- COMMAND ----------
 
@@ -181,7 +182,7 @@ SELECT  /* complete a query com uma AI Function para analisar o sentimento da av
 
 -- COMMAND ----------
 
-SELECT /* complete a query com uma AI Function para extrair os produtos mencionados */ FROM avaliacoes LIMIT 10
+SELECT *, ai_extract(avaliacao, ARRAY('produto')) AS produtos FROM avaliacoes LIMIT 10
 
 -- COMMAND ----------
 
@@ -191,12 +192,14 @@ SELECT /* complete a query com uma AI Function para extrair os produtos menciona
 
 -- COMMAND ----------
 
-SELECT /* complete a query com uma AI Function para extrair o motivo da insatisfação, quando houver */ FROM avaliacoes LIMIT 10
+SELECT *, ai_query(
+  'databricks-meta-llama-3-1-70b-instruct', 
+  concat('Se o sentimento da avaliação for negativo, liste os motivos de insatisfação. Avaliação: ', avaliacao)) AS motivo_insatisfacao 
+FROM avaliacoes LIMIT 10
 
 -- COMMAND ----------
 
--- MAGIC %md
--- MAGIC ### 4. Analisando sentimento e extraindo entidades em escala
+-- MAGIC %md ### 4. Analisando sentimento e extraindo entidades em escala
 -- MAGIC
 -- MAGIC Ter que especificar as instruções várias vezes acaba sendo trabalhoso, especialmente para Analistas de Dados que deveriam focar em analisar os resultados dessa extração.
 -- MAGIC
@@ -218,8 +221,13 @@ RETURN FROM_JSON(
   AI_QUERY(
     'databricks-meta-llama-3-1-70b-instruct',
     CONCAT(
-      '/* complete este prompt com as instruções necessárias para extrair todas as informações que precisamos */
-      
+      'Um cliente fez uma avaliação. Nós respondemos todos que aparentem descontentes.
+      Extraia as seguintes informações:
+      - extraia o nome do produto
+      - extraia a categoria de produto, por exemplo: tablet, notebook, smartphone
+      - classifique o sentimento como ["POSITIVO","NEGATIVO","NEUTRO"]
+      - retorne se o sentimento é NEGATIVO e precisa de responsta: S ou N
+      - se o sentimento é NEGATIVO, explique quais os principais motivos
       Retorne somente um JSON. Nenhum outro texto fora o JSON. Formato do JSON:
       {
         "produto_nome": <entidade nome>,
@@ -240,7 +248,7 @@ RETURN FROM_JSON(
 
 -- COMMAND ----------
 
-SELECT revisar_avaliacao(/* complete com um exemplo de texto com uma avaliação para testar a função */) AS resultado
+SELECT revisar_avaliacao('Comprei um tablet ASD e estou muito insatisfeito com a qualidade da bateria. Ela dura muito pouco tempo e demora muito para carregar.') AS resultado
 
 -- COMMAND ----------
 
@@ -250,8 +258,7 @@ SELECT revisar_avaliacao(/* complete com um exemplo de texto com uma avaliação
 
 -- CREATE TABLE avaliacoes_revisadas AS
 SELECT *, resultado.* FROM (
-  /* complete com uma query para revisar todas as avaliações */
-  LIMIT 10)
+  SELECT *, revisar_avaliacao(avaliacao) as resultado FROM avaliacoes LIMIT 10)
 
 -- COMMAND ----------
 
@@ -335,18 +342,12 @@ COMMENT 'Caso o cliente demonstre insatisfação com algum produto, use esta fun
 RETURN SELECT AI_QUERY(
     'databricks-meta-llama-3-1-70b-instruct',
     CONCAT(
-        /* 
-         * crie um prompt solicitando a geração da resposta
-         * explique o seu objetivo
-         * inclua os dados do cliente, produto e motivo de insatisfação para personalizar a resposta
-         * especifique que pode ser feita uma troca, caso esteja dentro da política
-         * adicione instruções para controlar o tamanho da mensagem e o tom do texto
-         * além de instruções para inibir alucinações ou comportamentos indesejados
-         *
-         * OBS:
-         * - Para acessar as variáveis da função utilize o padrão gerar_resposta.nome
-         * - Para concatenar os textos, basta listar os textos separados por vírgula, por exemplo: CONCAT('texto', gerar_resposta.nome, 'texto')
-         */
+        "Você é um assistente virtual de um e-commerce. Nosso cliente, ", gerar_resposta.nome, " ", gerar_resposta.sobrenome, " que comprou ", gerar_resposta.num_pedidos, " produtos este ano estava insatisfeito com o produto ", gerar_resposta.produto, 
+        ", pois ", gerar_resposta.motivo, ". Forneça uma breve mensagem empática para o cliente incluindo a oferta de troca do produto, caso  esteja em conformidade com a nossa política de trocas. A troca pode ser feita diretamente por esse assistente. ",
+        "Eu quero recuperar sua confiança e evitar que ele deixe de ser nosso cliente. ",
+        "Escreva uma mensagem com poucas sentenças. ",
+        "Não adicione nenhum texto além da mensagem. ",
+        "Não adicione nenhuma assinatura."
     )
 )
 
@@ -359,15 +360,17 @@ RETURN SELECT AI_QUERY(
 -- CREATE TABLE respostas AS
 
 WITH avaliacoes_enriq AS (
- /* 
-  * combine a tabela com as informações extraídas das avaliações que criamos anteriormente com a tabela de clientes 
-  * lembre-se que somente precisamos gerar uma resposta quando o cliente estiver insatisfeito 
-  */
+  SELECT a.*, c.* EXCEPT (c.id_cliente) 
+  FROM avaliacoes_revisadas a 
+  LEFT JOIN clientes c 
+  ON a.id_cliente = c.id_cliente 
+  WHERE a.resposta = 'S' 
+  LIMIT 10
 )
 
 SELECT 
   *, 
-  (SELECT * FROM /* complete com a função para gerar uma resposta */) AS rascunho 
+  (SELECT * FROM gerar_resposta(e.nome, e.sobrenome, e.num_pedidos, e.produto_nome, e.resposta_motivo)) AS rascunho 
 FROM avaliacoes_enriq e
 
 -- COMMAND ----------
